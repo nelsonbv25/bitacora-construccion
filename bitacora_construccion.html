@@ -284,6 +284,16 @@
       flex-wrap: wrap;
     }
 
+    .brand-footer {
+      padding: 18px 0 28px;
+      text-align: center;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0;
+      opacity: .82;
+    }
+
     @media (max-width: 768px) {
       .grid,
       .photo-preview,
@@ -523,6 +533,8 @@
     <p class="small-note">Las bitácoras se guardan solo en este navegador/dispositivo.</p>
     <div id="historial" class="historial-lista"></div>
   </div>
+
+  <footer class="brand-footer">Desarrollado por Nelson Barrientos</footer>
 
 </div>
 
@@ -1409,6 +1421,7 @@
             pdf.setFontSize(8);
             pdf.setTextColor(100, 116, 139);
             pdf.text(`Generado: ${fechaGeneracionPDF()}`, 0.35, alto - 0.22);
+            pdf.text("Desarrollado por Nelson Barrientos", ancho / 2, alto - 0.22, { align: "center" });
             pdf.text(`Página ${pagina} de ${totalPaginas}`, ancho - 0.35, alto - 0.22, { align: "right" });
           }
         })
