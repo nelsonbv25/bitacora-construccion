@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitácora de Construcción</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    :root {
+      --verde: #08783c;
+      --verde-oscuro: #045c2d;
+      --gris-fondo: #f3f6f8;
+      --gris-borde: #d9e2ec;
+      --texto: #1f2937;
+      --rojo: #b91c1c;
+      --azul: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--gris-fondo);
+      color: var(--texto);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 16px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--verde), var(--verde-oscuro));
+      color: white;
+      padding: 28px;
+      border-radius: 18px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.05);
+    }
+
+    .card h2 {
+      margin: 0 0 18px;
+      color: var(--verde-oscuro);
+      font-size: 21px;
+      border-bottom: 2px solid var(--gris-borde);
+      padding-bottom: 10px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--gris-borde);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 15px;
+      background: white;
+    }
+
+    input[readonly] {
+      background: #f1f5f9;
+      cursor: not-allowed;
+      font-weight: bold;
+    }
+
+    textarea {
+      min-height: 95px;
+      resize: vertical;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    th {
+      background: var(--verde);
+      color: white;
+      padding: 10px;
+      border: 1px solid #0b6b39;
+    }
+
+    td {
+      border: 1px solid var(--gris-borde);
+      padding: 7px;
+      background: white;
+    }
+
+    td input {
+      border: none;
+      padding: 7px;
+      border-radius: 0;
+    }
+
+    .btn {
+      background: var(--verde);
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-secondary { background: #334155; }
+    .btn-danger { background: var(--rojo); }
+    .btn-blue { background: var(--azul); }
+
+    .actions {
+      position: sticky;
+      bottom: 0;
+      background: rgba(243,246,248,.96);
+      padding: 14px 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--gris-borde);
+      z-index: 20;
+    }
+
+    .table-actions {
+      margin-top: 12px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .photo-preview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .foto-item {
+      border: 1px solid var(--gris-borde);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f8fafc;
+      position: relative;
+    }
+
+    .foto-item img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .foto-item button {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      background: var(--rojo);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 5px 8px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .signatures {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 25px;
+    }
+
+    .signature-box {
+      text-align: center;
+      padding-top: 40px;
+    }
+
+    .signature-line {
+      border-top: 1px solid #111;
+      padding-top: 8px;
+      font-weight: bold;
+    }
+
+    .small-note {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 8px;
+    }
+
+    .ubicacion-row {
+      display: flex;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .ubicacion-row > div:first-child {
+      flex: 1;
+    }
+
+    .historial-lista {
+      display: grid;
+      gap: 10px;
+    }
+
+    .historial-item {
+      border: 1px solid var(--gris-borde);
+      border-radius: 12px;
+      padding: 12px;
+      background: #f8fafc;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .historial-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .grid,
+      .photo-preview,
+      .signatures {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 23px;
+      }
+
+      table {
+        min-width: 720px;
+      }
+
+      .table-responsive {
+        overflow-x: auto;
+      }
+
+      .ubicacion-row {
+        display: block;
+      }
+
+      .ubicacion-row button,
+      .actions button {
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .historial-item {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Bitácora Diaria de Construcción</h1>
+    <p>Registro de actividades, personal, horarios, avances y evidencia fotográfica</p>
+  </div>
+
+  <div class="card">
+    <h2>1. Datos Generales</h2>
+
+    <div class="grid">
+      <div>
+        <label>N° Bitácora</label>
+        <input id="numeroBitacora" type="text" placeholder="Ej. 001">
+      </div>
+
+      <div>
+        <label>Fecha</label>
+        <input id="fecha" type="date">
+      </div>
+
+      <div>
+        <label>Nombre del Proyecto</label>
+        <input id="proyecto" type="text" placeholder="Nombre del proyecto">
+      </div>
+
+      <div>
+        <label>Ubicación automática</label>
+        <div class="ubicacion-row">
+          <div>
+            <input id="ubicacion" type="text" readonly placeholder="Debe obtener ubicación GPS">
+          </div>
+          <button class="btn btn-blue" type="button" onclick="obtenerUbicacion()">Obtener GPS</button>
+        </div>
+        <p class="small-note">Obligatorio. Sin GPS no se puede guardar ni generar PDF.</p>
+      </div>
+
+      <div>
+        <label>Contratista</label>
+        <input id="contratista" type="text" placeholder="Empresa contratista">
+      </div>
+
+      <div>
+        <label>Supervisor</label>
+        <input id="supervisor" type="text" placeholder="Nombre del supervisor">
+      </div>
+
+      <div>
+        <label>Técnico / Residente</label>
+        <input id="tecnico" type="text" placeholder="Responsable en campo">
+      </div>
+
+      <div>
+        <label>Estado del Clima</label>
+        <select id="clima">
+          <option value="">Seleccione...</option>
+          <option>Soleado</option>
+          <option>Nublado</option>
+          <option>Lluvioso</option>
+          <option>Mixto</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Control de Horario</h2>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Día</th>
+            <th>Hora Inicio</th>
+            <th>Hora Fin</th>
+            <th>Traslado</th>
+            <th>Extras</th>
+            <th>Nocturnas</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tablaHorario">
+          <tr>
+            <td><input type="text" placeholder="Ej. Lunes"></td>
+            <td><input type="time"></td>
+            <td><input type="time"></td>
+            <td><input type="text"></td>
+            <td><input type="text"></td>
+            <td><input type="text"></td>
+            <td><button class="btn btn-danger" type="button" onclick="eliminarFila(this)">Eliminar</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-actions">
+      <button class="btn" type="button" onclick="agregarFilaHorario()">+ Agregar horario</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>3. Personal en Campo</h2>
+
+    <div class="grid">
+      <div>
+        <label>Cantidad de Personal</label>
+        <input id="cantidadPersonal" type="number" placeholder="Ej. 8">
+      </div>
+
+      <div>
+        <label>Tipo de Cuadrilla</label>
+        <input id="tipoCuadrilla" type="text" placeholder="Albañiles, electricistas, ayudantes...">
+      </div>
+    </div>
+
+    <br>
+
+    <label>Detalle del Personal</label>
+    <textarea id="detallePersonal" placeholder="Ej. 1 maestro de obra, 3 albañiles, 4 ayudantes..."></textarea>
+  </div>
+
+  <div class="card">
+    <h2>4. Actividades Realizadas</h2>
+    <textarea id="actividades" placeholder="Describa las actividades ejecutadas durante la jornada..."></textarea>
+  </div>
+
+  <div class="card">
+    <h2>5. Resultado Obtenido</h2>
+    <textarea id="resultado" placeholder="Indique qué avance o resultado se obtuvo..."></textarea>
+  </div>
+
+  <div class="card">
+    <h2>6. Materiales y Equipos Utilizados</h2>
+
+    <div class="grid">
+      <div>
+        <label>Materiales</label>
+        <textarea id="materiales" placeholder="Ej. Cemento, arena, PVC, varilla..."></textarea>
+      </div>
+
+      <div>
+        <label>Equipos / Herramientas</label>
+        <textarea id="equipos" placeholder="Ej. Mezcladora, retroexcavadora, taladro..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>7. Recomendaciones / Observaciones</h2>
+    <textarea id="observaciones" placeholder="Problemas encontrados, recomendaciones técnicas, pendientes o próximos pasos..."></textarea>
+  </div>
+
+  <div class="card">
+    <h2>8. Evidencia Fotográfica</h2>
+    <input id="fotos" type="file" accept="image/*" multiple>
+    <p class="small-note">Puedes seleccionar varias fotos. También puedes volver a seleccionar más y se irán agregando.</p>
+    <div id="preview" class="photo-preview"></div>
+  </div>
+
+  <div class="card">
+    <h2>9. Firmas</h2>
+
+    <div class="signatures">
+      <div>
+        <label>Nombre Supervisor</label>
+        <input id="firmaSupervisor" type="text" placeholder="Nombre">
+        <div class="signature-box">
+          <div class="signature-line">Supervisor</div>
+        </div>
+      </div>
+
+      <div>
+        <label>Nombre Coordinador</label>
+        <input id="firmaCoordinador" type="text" placeholder="Nombre">
+        <div class="signature-box">
+          <div class="signature-line">Coordinador</div>
+        </div>
+      </div>
+
+      <div>
+        <label>Nombre Director / Cliente</label>
+        <input id="firmaDirector" type="text" placeholder="Nombre">
+        <div class="signature-box">
+          <div class="signature-line">Director / Cliente</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>10. Historial guardado en este dispositivo</h2>
+    <p class="small-note">Las bitácoras se guardan solo en este navegador/dispositivo.</p>
+    <div id="historial" class="historial-lista"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" type="button" onclick="limpiarFormulario()">Limpiar</button>
+    <button class="btn btn-blue" type="button" onclick="guardarBitacora()">Guardar en historial</button>
+    <button class="btn" type="button" onclick="generarPDF()">Generar PDF</button>
+  </div>
+
+</div>
+
+<script>
+  let fotosBase64 = [];
+  const STORAGE_KEY = "bitacorasConstruccion";
+
+  document.addEventListener("DOMContentLoaded", function () {
+    colocarFechaActual();
+    cargarHistorial();
+  });
+
+  function colocarFechaActual() {
+    const fecha = document.getElementById("fecha");
+    if (!fecha.value) {
+      const hoy = new Date();
+      const yyyy = hoy.getFullYear();
+      const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+      const dd = String(hoy.getDate()).padStart(2, "0");
+      fecha.value = `${yyyy}-${mm}-${dd}`;
+    }
+  }
+
+  function obtenerUbicacion() {
+    const campo = document.getElementById("ubicacion");
+
+    if (!navigator.geolocation) {
+      campo.value = "Geolocalización no disponible";
+      return;
+    }
+
+    campo.value = "Obteniendo ubicación...";
+
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        const lat = position.coords.latitude.toFixed(6);
+        const lng = position.coords.longitude.toFixed(6);
+        const precision = Math.round(position.coords.accuracy);
+        campo.value = `${lat}, ${lng} | Precisión aprox.: ${precision} m`;
+      },
+      function (error) {
+        if (error.code === 1) campo.value = "Permiso de ubicación denegado";
+        else if (error.code === 2) campo.value = "Ubicación no disponible";
+        else if (error.code === 3) campo.value = "Tiempo agotado al obtener ubicación";
+        else campo.value = "No se pudo obtener ubicación";
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      }
+    );
+  }
+
+  function ubicacionValida() {
+    const ubicacion = obtenerValor("ubicacion");
+
+    const esInvalida =
+      !ubicacion ||
+      ubicacion.includes("Debe obtener") ||
+      ubicacion.includes("Obteniendo") ||
+      ubicacion.includes("denegado") ||
+      ubicacion.includes("no disponible") ||
+      ubicacion.includes("No se pudo") ||
+      ubicacion.includes("Tiempo agotado") ||
+      ubicacion.includes("Geolocalización");
+
+    if (esInvalida) {
+      alert("Debes obtener la ubicación GPS antes de guardar o generar el PDF.");
+      document.getElementById("ubicacion").focus();
+      return false;
+    }
+
+    return true;
+  }
+
+  function obtenerValor(id) {
+    const campo = document.getElementById(id);
+    if (!campo) return "";
+    return campo.value && campo.value.trim() !== "" ? campo.value.trim() : "";
+  }
+
+  function escaparTexto(texto) {
+    return String(texto || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function agregarFilaHorario() {
+    const tbody = document.getElementById("tablaHorario");
+
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td><input type="text" placeholder="Ej. Martes"></td>
+      <td><input type="time"></td>
+      <td><input type="time"></td>
+      <td><input type="text"></td>
+      <td><input type="text"></td>
+      <td><input type="text"></td>
+      <td><button class="btn btn-danger" type="button" onclick="eliminarFila(this)">Eliminar</button></td>
+    `;
+
+    tbody.appendChild(fila);
+  }
+
+  function eliminarFila(boton) {
+    const tbody = document.getElementById("tablaHorario");
+
+    if (tbody.rows.length > 1) {
+      boton.closest("tr").remove();
+    } else {
+      boton.closest("tr").querySelectorAll("input").forEach(input => input.value = "");
+    }
+  }
+
+  document.getElementById("fotos").addEventListener("change", function () {
+    const archivos = Array.from(this.files);
+
+    archivos.forEach(file => {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        fotosBase64.push(e.target.result);
+        renderizarFotos();
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    this.value = "";
+  });
+
+  function renderizarFotos() {
+    const preview = document.getElementById("preview");
+    preview.innerHTML = "";
+
+    fotosBase64.forEach((foto, index) => {
+      const div = document.createElement("div");
+      div.className = "foto-item";
+      div.innerHTML = `
+        <button type="button" onclick="eliminarFoto(${index})">X</button>
+        <img src="${foto}">
+      `;
+      preview.appendChild(div);
+    });
+  }
+
+  function eliminarFoto(index) {
+    fotosBase64.splice(index, 1);
+    renderizarFotos();
+  }
+
+  function obtenerHorarios() {
+    const horarios = [];
+
+    document.querySelectorAll("#tablaHorario tr").forEach(row => {
+      const inputs = row.querySelectorAll("input");
+
+      const item = {
+        dia: inputs[0]?.value || "",
+        inicio: inputs[1]?.value || "",
+        fin: inputs[2]?.value || "",
+        traslado: inputs[3]?.value || "",
+        extras: inputs[4]?.value || "",
+        nocturnas: inputs[5]?.value || ""
+      };
+
+      const vacio = !item.dia && !item.inicio && !item.fin && !item.traslado && !item.extras && !item.nocturnas;
+      if (!vacio) horarios.push(item);
+    });
+
+    return horarios;
+  }
+
+  function cargarHorarios(horarios) {
+    const tbody = document.getElementById("tablaHorario");
+    tbody.innerHTML = "";
+
+    if (!horarios || horarios.length === 0) {
+      agregarFilaHorario();
+      return;
+    }
+
+    horarios.forEach(h => {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td><input type="text" value="${escaparTexto(h.dia)}"></td>
+        <td><input type="time" value="${escaparTexto(h.inicio)}"></td>
+        <td><input type="time" value="${escaparTexto(h.fin)}"></td>
+        <td><input type="text" value="${escaparTexto(h.traslado)}"></td>
+        <td><input type="text" value="${escaparTexto(h.extras)}"></td>
+        <td><input type="text" value="${escaparTexto(h.nocturnas)}"></td>
+        <td><button class="btn btn-danger" type="button" onclick="eliminarFila(this)">Eliminar</button></td>
+      `;
+      tbody.appendChild(fila);
+    });
+  }
+
+  function crearObjetoBitacora() {
+    return {
+      id: Date.now(),
+      numeroBitacora: obtenerValor("numeroBitacora"),
+      fecha: obtenerValor("fecha"),
+      proyecto: obtenerValor("proyecto"),
+      ubicacion: obtenerValor("ubicacion"),
+      contratista: obtenerValor("contratista"),
+      supervisor: obtenerValor("supervisor"),
+      tecnico: obtenerValor("tecnico"),
+      clima: obtenerValor("clima"),
+      cantidadPersonal: obtenerValor("cantidadPersonal"),
+      tipoCuadrilla: obtenerValor("tipoCuadrilla"),
+      detallePersonal: obtenerValor("detallePersonal"),
+      actividades: obtenerValor("actividades"),
+      resultado: obtenerValor("resultado"),
+      materiales: obtenerValor("materiales"),
+      equipos: obtenerValor("equipos"),
+      observaciones: obtenerValor("observaciones"),
+      firmaSupervisor: obtenerValor("firmaSupervisor"),
+      firmaCoordinador: obtenerValor("firmaCoordinador"),
+      firmaDirector: obtenerValor("firmaDirector"),
+      horarios: obtenerHorarios(),
+      fotos: fotosBase64,
+      guardadoEn: new Date().toLocaleString()
+    };
+  }
+
+  function guardarBitacora() {
+    if (!ubicacionValida()) return;
+
+    const bitacoras = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const nueva = crearObjetoBitacora();
+
+    if (!nueva.numeroBitacora && !nueva.proyecto && !nueva.actividades) {
+      alert("Agrega al menos número de bitácora, proyecto o actividades antes de guardar.");
+      return;
+    }
+
+    bitacoras.unshift(nueva);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(bitacoras));
+
+    cargarHistorial();
+    alert("Bitácora guardada en este dispositivo.");
+  }
+
+  function cargarHistorial() {
+    const contenedor = document.getElementById("historial");
+    const bitacoras = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    if (bitacoras.length === 0) {
+      contenedor.innerHTML = `<p class="small-note">No hay bitácoras guardadas todavía.</p>`;
+      return;
+    }
+
+    contenedor.innerHTML = "";
+
+    bitacoras.forEach(b => {
+      const item = document.createElement("div");
+      item.className = "historial-item";
+
+      item.innerHTML = `
+        <div>
+          <strong>Bitácora ${escaparTexto(b.numeroBitacora || "Sin número")}</strong><br>
+          <span>${escaparTexto(b.fecha || "Sin fecha")} - ${escaparTexto(b.proyecto || "Sin proyecto")}</span><br>
+          <small>Guardado: ${escaparTexto(b.guardadoEn || "")}</small>
+        </div>
+
+        <div class="historial-actions">
+          <button class="btn btn-blue" type="button" onclick="cargarBitacora(${b.id})">Abrir</button>
+          <button class="btn btn-danger" type="button" onclick="eliminarBitacora(${b.id})">Eliminar</button>
+        </div>
+      `;
+
+      contenedor.appendChild(item);
+    });
+  }
+
+  function cargarBitacora(id) {
+    const bitacoras = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const b = bitacoras.find(item => item.id === id);
+
+    if (!b) return alert("No se encontró la bitácora.");
+
+    document.getElementById("numeroBitacora").value = b.numeroBitacora || "";
+    document.getElementById("fecha").value = b.fecha || "";
+    document.getElementById("proyecto").value = b.proyecto || "";
+    document.getElementById("ubicacion").value = b.ubicacion || "";
+    document.getElementById("contratista").value = b.contratista || "";
+    document.getElementById("supervisor").value = b.supervisor || "";
+    document.getElementById("tecnico").value = b.tecnico || "";
+    document.getElementById("clima").value = b.clima || "";
+    document.getElementById("cantidadPersonal").value = b.cantidadPersonal || "";
+    document.getElementById("tipoCuadrilla").value = b.tipoCuadrilla || "";
+    document.getElementById("detallePersonal").value = b.detallePersonal || "";
+    document.getElementById("actividades").value = b.actividades || "";
+    document.getElementById("resultado").value = b.resultado || "";
+    document.getElementById("materiales").value = b.materiales || "";
+    document.getElementById("equipos").value = b.equipos || "";
+    document.getElementById("observaciones").value = b.observaciones || "";
+    document.getElementById("firmaSupervisor").value = b.firmaSupervisor || "";
+    document.getElementById("firmaCoordinador").value = b.firmaCoordinador || "";
+    document.getElementById("firmaDirector").value = b.firmaDirector || "";
+
+    cargarHorarios(b.horarios || []);
+    fotosBase64 = b.fotos || [];
+    renderizarFotos();
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function eliminarBitacora(id) {
+    if (!confirm("¿Deseas eliminar esta bitácora del historial?")) return;
+
+    let bitacoras = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    bitacoras = bitacoras.filter(item => item.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(bitacoras));
+
+    cargarHistorial();
+  }
+
+  function generarFilasHorarioPDF() {
+    const horarios = obtenerHorarios();
+
+    if (horarios.length === 0) {
+      return `
+        <tr>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+        </tr>
+      `;
+    }
+
+    return horarios.map(h => `
+      <tr>
+        <td>${escaparTexto(h.dia)}</td>
+        <td>${escaparTexto(h.inicio)}</td>
+        <td>${escaparTexto(h.fin)}</td>
+        <td>${escaparTexto(h.traslado)}</td>
+        <td>${escaparTexto(h.extras)}</td>
+        <td>${escaparTexto(h.nocturnas)}</td>
+      </tr>
+    `).join("");
+  }
+
+  function generarFotosPDF() {
+    if (fotosBase64.length === 0) {
+      return `<p class="texto-vacio">Sin evidencia fotográfica adjunta.</p>`;
+    }
+
+    return fotosBase64.map((foto, index) => `
+      <div class="foto-pdf">
+        <img src="${foto}">
+        <p>Foto ${index + 1}</p>
+      </div>
+    `).join("");
+  }
+
+  function generarPDF() {
+    if (!ubicacionValida()) return;
+
+    const reporte = document.createElement("div");
+
+    reporte.innerHTML = `
+      <style>
+        .pdf-documento {
+          font-family: Arial, sans-serif;
+          color: #111827;
+          background: white;
+          padding: 12px;
+          width: 100%;
+        }
+
+        .pdf-header {
+          text-align: center;
+          border-bottom: 3px solid #08783c;
+          padding-bottom: 12px;
+          margin-bottom: 18px;
+        }
+
+        .pdf-header h1 {
+          margin: 0;
+          font-size: 22px;
+          color: #08783c;
+          text-transform: uppercase;
+        }
+
+        .pdf-header p {
+          margin: 6px 0 0;
+          font-size: 12px;
+          color: #475569;
+        }
+
+        .section {
+          margin-bottom: 15px;
+          page-break-inside: avoid;
+        }
+
+        .section h2 {
+          font-size: 15px;
+          color: #08783c;
+          border-bottom: 1px solid #cbd5e1;
+          padding-bottom: 5px;
+          margin: 0 0 8px;
+        }
+
+        .grid-pdf {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px 18px;
+          font-size: 12px;
+        }
+
+        .campo {
+          border: 1px solid #e2e8f0;
+          padding: 7px;
+          border-radius: 6px;
+          min-height: 31px;
+        }
+
+        .campo strong {
+          display: block;
+          font-size: 11px;
+          color: #334155;
+          margin-bottom: 3px;
+        }
+
+        .texto-largo {
+          border: 1px solid #e2e8f0;
+          border-radius: 6px;
+          padding: 8px;
+          min-height: 55px;
+          font-size: 12px;
+          white-space: pre-wrap;
+        }
+
+        .texto-vacio {
+          font-size: 12px;
+          color: #64748b;
+          margin: 0;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 11px;
+        }
+
+        th {
+          background: #08783c;
+          color: white;
+          padding: 7px;
+          border: 1px solid #08783c;
+        }
+
+        td {
+          border: 1px solid #cbd5e1;
+          padding: 7px;
+          min-height: 20px;
+        }
+
+        .fotos-pdf {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
+
+        .foto-pdf {
+          text-align: center;
+          page-break-inside: avoid;
+        }
+
+        .foto-pdf img {
+          width: 100%;
+          max-height: 230px;
+          object-fit: cover;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+        }
+
+        .foto-pdf p {
+          margin: 4px 0 0;
+          font-size: 11px;
+          color: #475569;
+        }
+
+        .firmas-pdf {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          margin-top: 45px;
+          text-align: center;
+          font-size: 11px;
+          page-break-inside: avoid;
+        }
+
+        .firma-linea {
+          border-top: 1px solid #111;
+          padding-top: 6px;
+          margin-top: 35px;
+          font-weight: bold;
+        }
+
+        .nombre-firma {
+          min-height: 16px;
+          margin-bottom: 4px;
+        }
+	.pdf-logo {
+          width: 105px;
+          height: auto;
+          display: block;
+          margin: 0 auto 8px;
+	}
+      </style>
+
+      <div class="pdf-documento">
+        <div class="pdf-header">
+  		<img src="logo.png" class="pdf-logo">
+  		<h1>Bitácora Diaria de Construcción</h1>
+  		<p>Registro de actividades, personal, horarios, avances y evidencia fotográfica</p>
+	</div>
+
+        <div class="section">
+          <h2>1. Datos Generales</h2>
+          <div class="grid-pdf">
+            <div class="campo"><strong>N° Bitácora</strong>${escaparTexto(obtenerValor("numeroBitacora"))}</div>
+            <div class="campo"><strong>Fecha</strong>${escaparTexto(obtenerValor("fecha"))}</div>
+            <div class="campo"><strong>Nombre del Proyecto</strong>${escaparTexto(obtenerValor("proyecto"))}</div>
+            <div class="campo"><strong>Ubicación GPS</strong>${escaparTexto(obtenerValor("ubicacion"))}</div>
+            <div class="campo"><strong>Contratista</strong>${escaparTexto(obtenerValor("contratista"))}</div>
+            <div class="campo"><strong>Supervisor</strong>${escaparTexto(obtenerValor("supervisor"))}</div>
+            <div class="campo"><strong>Técnico / Residente</strong>${escaparTexto(obtenerValor("tecnico"))}</div>
+            <div class="campo"><strong>Estado del Clima</strong>${escaparTexto(obtenerValor("clima"))}</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>2. Control de Horario</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Día</th>
+                <th>Hora Inicio</th>
+                <th>Hora Fin</th>
+                <th>Traslado</th>
+                <th>Extras</th>
+                <th>Nocturnas</th>
+              </tr>
+            </thead>
+            <tbody>${generarFilasHorarioPDF()}</tbody>
+          </table>
+        </div>
+
+        <div class="section">
+          <h2>3. Personal en Campo</h2>
+          <div class="grid-pdf">
+            <div class="campo"><strong>Cantidad de Personal</strong>${escaparTexto(obtenerValor("cantidadPersonal"))}</div>
+            <div class="campo"><strong>Tipo de Cuadrilla</strong>${escaparTexto(obtenerValor("tipoCuadrilla"))}</div>
+          </div>
+          <br>
+          <div class="texto-largo">${escaparTexto(obtenerValor("detallePersonal"))}</div>
+        </div>
+
+        <div class="section">
+          <h2>4. Actividades Realizadas</h2>
+          <div class="texto-largo">${escaparTexto(obtenerValor("actividades"))}</div>
+        </div>
+
+        <div class="section">
+          <h2>5. Resultado Obtenido</h2>
+          <div class="texto-largo">${escaparTexto(obtenerValor("resultado"))}</div>
+        </div>
+
+        <div class="section">
+          <h2>6. Materiales y Equipos Utilizados</h2>
+          <div class="grid-pdf">
+            <div>
+              <h2 style="font-size:13px;border:none;margin-bottom:5px;">Materiales</h2>
+              <div class="texto-largo">${escaparTexto(obtenerValor("materiales"))}</div>
+            </div>
+            <div>
+              <h2 style="font-size:13px;border:none;margin-bottom:5px;">Equipos / Herramientas</h2>
+              <div class="texto-largo">${escaparTexto(obtenerValor("equipos"))}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>7. Recomendaciones / Observaciones</h2>
+          <div class="texto-largo">${escaparTexto(obtenerValor("observaciones"))}</div>
+        </div>
+
+        <div class="section">
+          <h2>8. Evidencia Fotográfica</h2>
+          <div class="fotos-pdf">${generarFotosPDF()}</div>
+        </div>
+
+        <div class="firmas-pdf">
+          <div>
+            <div class="nombre-firma">${escaparTexto(obtenerValor("firmaSupervisor"))}</div>
+            <div class="firma-linea">Supervisor</div>
+          </div>
+          <div>
+            <div class="nombre-firma">${escaparTexto(obtenerValor("firmaCoordinador"))}</div>
+            <div class="firma-linea">Coordinador</div>
+          </div>
+          <div>
+            <div class="nombre-firma">${escaparTexto(obtenerValor("firmaDirector"))}</div>
+            <div class="firma-linea">Director / Cliente</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const opciones = {
+      margin: 0.35,
+      filename: `bitacora_${obtenerValor("numeroBitacora") || "construccion"}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        scrollY: 0
+      },
+      jsPDF: {
+        unit: "in",
+        format: "letter",
+        orientation: "portrait"
+      },
+      pagebreak: {
+        mode: ["css", "legacy"],
+        avoid: [".section", ".foto-pdf", ".firmas-pdf"]
+      }
+    };
+
+    html2pdf().set(opciones).from(reporte).save();
+  }
+
+  function limpiarFormulario() {
+    if (!confirm("¿Deseas limpiar toda la bitácora actual?")) return;
+
+    document.querySelectorAll("input, textarea, select").forEach(campo => {
+      if (campo.type !== "file") campo.value = "";
+    });
+
+    const tbody = document.getElementById("tablaHorario");
+    tbody.innerHTML = `
+      <tr>
+        <td><input type="text" placeholder="Ej. Lunes"></td>
+        <td><input type="time"></td>
+        <td><input type="time"></td>
+        <td><input type="text"></td>
+        <td><input type="text"></td>
+        <td><input type="text"></td>
+        <td><button class="btn btn-danger" type="button" onclick="eliminarFila(this)">Eliminar</button></td>
+      </tr>
+    `;
+
+    fotosBase64 = [];
+    renderizarFotos();
+    colocarFechaActual();
+  }
+</script>
+
+</body>
+</html>
