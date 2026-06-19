@@ -147,14 +147,36 @@
     .btn-blue { background: var(--azul); }
 
     .actions {
-      background: transparent;
-      padding: 8px 0 24px;
+      background: #ffffff;
+      border: 1px solid #d8e0ea;
+      border-left: 5px solid var(--verde);
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin: 18px 0;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(15,23,42,.04);
+    }
+
+    .actions-title {
+      font-weight: 800;
+      color: var(--verde-oscuro);
+      font-size: 17px;
+    }
+
+    .actions-subtitle {
+      color: #64748b;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .actions-buttons {
       display: flex;
       justify-content: flex-end;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
-      border-top: 1px solid var(--gris-borde);
-      margin-top: 18px;
     }
 
     .table-actions {
@@ -264,18 +286,82 @@
 
     .historial-lista {
       display: grid;
-      gap: 10px;
+      gap: 12px;
+    }
+
+    .historial-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      border-bottom: 2px solid var(--gris-borde);
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .historial-header h2 {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 4px;
+    }
+
+    .historial-resumen {
+      color: #64748b;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .historial-badge {
+      background: #ecfdf3;
+      border: 1px solid #bbf7d0;
+      color: var(--verde-oscuro);
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
     }
 
     .historial-item {
       border: 1px solid var(--gris-borde);
       border-radius: 8px;
-      padding: 12px;
-      background: #f8fafc;
+      padding: 14px;
+      background: white;
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 10px;
+      gap: 14px;
       align-items: center;
+      box-shadow: 0 1px 4px rgba(15,23,42,.04);
+    }
+
+    .historial-kicker {
+      color: var(--verde-oscuro);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .historial-titulo {
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .historial-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: #475569;
+      font-size: 13px;
+    }
+
+    .historial-chip {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 999px;
+      padding: 4px 8px;
     }
 
     .historial-actions {
@@ -285,13 +371,19 @@
     }
 
     .brand-footer {
-      padding: 18px 0 28px;
+      border-top: 1px solid var(--gris-borde);
+      padding: 20px 0 28px;
+      margin-top: 12px;
       text-align: center;
       color: #64748b;
       font-size: 13px;
       font-weight: 600;
       letter-spacing: 0;
       opacity: .82;
+    }
+
+    .brand-footer strong {
+      color: var(--verde-oscuro);
     }
 
     @media (max-width: 768px) {
@@ -319,12 +411,34 @@
 
       .ubicacion-row button,
       .actions button {
-        margin-top: 10px;
         width: 100%;
+      }
+
+      .ubicacion-row button {
+        margin-top: 10px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .actions-buttons {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
       }
 
       .historial-item {
         grid-template-columns: 1fr;
+      }
+
+      .historial-header {
+        display: block;
+      }
+
+      .historial-badge {
+        display: inline-block;
+        margin-top: 8px;
       }
     }
   </style>
@@ -522,19 +636,30 @@
   </div>
 
   <div class="actions">
-    <button class="btn btn-secondary" type="button" onclick="limpiarFormulario()">Limpiar</button>
-    <button class="btn btn-blue" type="button" onclick="guardarBitacora()">Guardar en historial</button>
-    <button class="btn btn-secondary" type="button" onclick="abrirVistaPreviaPDF()">Vista previa PDF</button>
-    <button id="btnGenerarPDF" class="btn" type="button" onclick="generarPDF()">Generar PDF</button>
+    <div>
+      <div class="actions-title">Acciones de la bitácora</div>
+      <div class="actions-subtitle">Guarda el registro, revisa el documento o genera el PDF final.</div>
+    </div>
+    <div class="actions-buttons">
+      <button class="btn btn-secondary" type="button" onclick="limpiarFormulario()">Limpiar</button>
+      <button class="btn btn-blue" type="button" onclick="guardarBitacora()">Guardar en historial</button>
+      <button class="btn btn-secondary" type="button" onclick="abrirVistaPreviaPDF()">Vista previa PDF</button>
+      <button id="btnGenerarPDF" class="btn" type="button" onclick="generarPDF()">Generar PDF</button>
+    </div>
   </div>
 
   <div class="card">
-    <h2>10. Historial guardado en este dispositivo</h2>
-    <p class="small-note">Las bitácoras se guardan solo en este navegador/dispositivo.</p>
+    <div class="historial-header">
+      <div>
+        <h2>10. Historial de bitácoras</h2>
+        <p id="historialResumen" class="historial-resumen">Registros almacenados localmente en este navegador.</p>
+      </div>
+      <span id="historialBadge" class="historial-badge">0 registros</span>
+    </div>
     <div id="historial" class="historial-lista"></div>
   </div>
 
-  <footer class="brand-footer">Desarrollado por Nelson Barrientos</footer>
+  <footer class="brand-footer">Sistema de Bitácora de Construcción | <strong>Desarrollado por Nelson Barrientos</strong></footer>
 
 </div>
 
@@ -864,7 +989,17 @@
 
   function cargarHistorial() {
     const contenedor = document.getElementById("historial");
+    const resumen = document.getElementById("historialResumen");
+    const badge = document.getElementById("historialBadge");
     const bitacoras = obtenerBitacorasGuardadas();
+    const total = bitacoras.length;
+
+    if (badge) badge.textContent = `${total} ${total === 1 ? "registro" : "registros"}`;
+    if (resumen) {
+      resumen.textContent = total === 0
+        ? "Registros almacenados localmente en este navegador."
+        : `${total} ${total === 1 ? "bitácora almacenada" : "bitácoras almacenadas"} en este dispositivo.`;
+    }
 
     if (bitacoras.length === 0) {
       contenedor.innerHTML = `<p class="small-note">No hay bitácoras guardadas todavía.</p>`;
@@ -876,12 +1011,18 @@
     bitacoras.forEach(b => {
       const item = document.createElement("div");
       item.className = "historial-item";
+      const fotos = normalizarFotos(b.fotos || []);
+      const totalFotos = fotos.length;
 
       item.innerHTML = `
         <div>
-          <strong>Bitácora ${escaparTexto(b.numeroBitacora || "Sin número")}</strong><br>
-          <span>${escaparTexto(b.fecha || "Sin fecha")} - ${escaparTexto(b.proyecto || "Sin proyecto")}</span><br>
-          <small>Guardado: ${escaparTexto(b.guardadoEn || "")}</small>
+          <div class="historial-kicker">Bitácora ${escaparTexto(b.numeroBitacora || "Sin número")}</div>
+          <div class="historial-titulo">${escaparTexto(b.proyecto || "Sin proyecto")}</div>
+          <div class="historial-meta">
+            <span class="historial-chip">Fecha: ${escaparTexto(formatearFechaPDF(b.fecha) || "Sin fecha")}</span>
+            <span class="historial-chip">${totalFotos} ${totalFotos === 1 ? "foto" : "fotos"}</span>
+            <span class="historial-chip">Guardado: ${escaparTexto(b.guardadoEn || "Sin fecha de guardado")}</span>
+          </div>
         </div>
 
         <div class="historial-actions">
