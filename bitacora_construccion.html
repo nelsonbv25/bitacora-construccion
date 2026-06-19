@@ -662,24 +662,54 @@
     }
   }
 
-  document.getElementById("fotos").addEventListener("change", function () {
-    const archivos = Array.from(this.files);
-
-    archivos.forEach(file => {
+  function comprimirImagen(file) {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
       reader.onload = function (e) {
-        fotosBase64.push({
-          src: e.target.result,
-          descripcion: ""
-        });
-        renderizarFotos();
+        const img = new Image();
+
+        img.onload = function () {
+          const maxLado = 1280;
+          const escala = Math.min(1, maxLado / Math.max(img.width, img.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(img.width * escala);
+          canvas.height = Math.round(img.height * escala);
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", 0.72));
+        };
+
+        img.onerror = function () {
+          resolve(e.target.result);
+        };
+
+        img.src = e.target.result;
       };
 
+      reader.onerror = reject;
       reader.readAsDataURL(file);
     });
+  }
 
+  document.getElementById("fotos").addEventListener("change", async function () {
+    const archivos = Array.from(this.files);
     this.value = "";
+
+    for (const file of archivos) {
+      try {
+        const fotoComprimida = await comprimirImagen(file);
+        fotosBase64.push({
+          src: fotoComprimida,
+          descripcion: ""
+        });
+      } catch (error) {
+        alert(`No se pudo cargar la foto "${file.name}". Intenta con otra imagen.`);
+      }
+    }
+
+    renderizarFotos();
   });
 
   function renderizarFotos() {
@@ -788,10 +818,18 @@
     };
   }
 
+  function obtenerBitacorasGuardadas() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    } catch (error) {
+      return [];
+    }
+  }
+
   function guardarBitacora() {
     if (!ubicacionValida()) return;
 
-    const bitacoras = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const bitacoras = obtenerBitacorasGuardadas();
     const nueva = crearObjetoBitacora();
 
     if (!nueva.numeroBitacora && !nueva.proyecto && !nueva.actividades) {
@@ -800,7 +838,13 @@
     }
 
     bitacoras.unshift(nueva);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(bitacoras));
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bitacoras));
+    } catch (error) {
+      alert("No se pudo guardar porque el historial del navegador está lleno. Elimina bitácoras antiguas del historial o reduce la cantidad de fotos e intenta de nuevo.");
+      return;
+    }
 
     cargarHistorial();
     alert("Bitácora guardada en este dispositivo.");
@@ -808,7 +852,7 @@
 
   function cargarHistorial() {
     const contenedor = document.getElementById("historial");
-    const bitacoras = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const bitacoras = obtenerBitacorasGuardadas();
 
     if (bitacoras.length === 0) {
       contenedor.innerHTML = `<p class="small-note">No hay bitácoras guardadas todavía.</p>`;
@@ -839,7 +883,7 @@
   }
 
   function cargarBitacora(id) {
-    const bitacoras = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const bitacoras = obtenerBitacorasGuardadas();
     const b = bitacoras.find(item => item.id === id);
 
     if (!b) return alert("No se encontró la bitácora.");
@@ -874,7 +918,7 @@
   function eliminarBitacora(id) {
     if (!confirm("¿Deseas eliminar esta bitácora del historial?")) return;
 
-    let bitacoras = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    let bitacoras = obtenerBitacorasGuardadas();
     bitacoras = bitacoras.filter(item => item.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bitacoras));
 
